@@ -19,12 +19,31 @@ router.get('/books', async (req, res) => {
   res.json({code: '200', result: result});
 });
 
-/*
+
 //Create Books
 router.post('/create-book', async (req,res) =>{
+    //acceso a la DataBase
+    const db = await connect();
+    //obtener el request body para insertar en la DB
+    console.log(req.body)
+    //#1 manera de crear el objeto tradiccional
+    const book = {
+        title: req.body.title,
+        descripcion: req.body.description
+    }
+    //modo #2 desestructurar
+    //const {title, descripcion} = req.body
+    //const book = {title, descripcion}
 
+    //Create book en la BD
+    const result = await db.collection('books').insertOne(book);
+    console.log(result)
+    res.json({
+        code: "201",
+        result: result.insertedId
+    })
 })
-
+/*
 //Upadate books
 router.put('/update-book/:bookid', async (req, res) =>{
     const bookid = req.params.bookid;
