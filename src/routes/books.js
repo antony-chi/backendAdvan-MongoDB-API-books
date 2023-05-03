@@ -3,6 +3,7 @@ const router = Router();
 
 //importar la BD conection
 import { connect } from "../database.js";
+import { ObjectId } from "mongodb";
 //import { ObjectId } from "mongodb";
 
 
@@ -38,30 +39,34 @@ router.post('/create-book', async (req,res) =>{
     //Create book en la BD
     const result = await db.collection('books').insertOne(book);
     console.log(result)
+    console.log('se creo el libro con exito')
     res.json({
         code: "201",
         result: result.insertedId
     })
 })
-/*
+
 //Upadate books
 router.put('/update-book/:bookid', async (req, res) =>{
+    //obtenemos el bookid del param
     const bookid = req.params.bookid;
+    console.log(bookid)
     const bookUpdate = {
         title: req.body.title,
-        descripcion: req.body.description
+        description: req.body.description
     }
+    //conectamos a la base d
     const db = await connect();
-
-    //cfind the book by id update
-    const result = await db.collection('books').updateOne({_id: ObjectId(bookid)}, {$set: bookUpdate});
-    
-    console.log(result);
-    if(result.matcheCount > 0){
-        res.json({code: 201, message:`Book ${bookid} se ha actualizado!!`})
+    //busca el libro por id y lo actualiza con los datos mandados en JSON
+    const result = await db.collection('books').updateOne({_id:ObjectId(bookid)}, {$set: bookUpdate})
+    console.log(result)
+    //mensaje informativo para mostrar al cliente la operacion exitosa
+    if(result.matchedCount > 0 ){
+        res.json({conde: 201, message: `Book ${bookid} has been update complete!!`})
     }else{
-        res.json({code: 404, message: `No se pudo actualizar el libro ${bookid}`})
+        res.json({menssage: `Could not update the book ${bookUpdate}`})
     }
+    
 });
 
 //Delete books
@@ -70,16 +75,18 @@ router.delete('/delete-book/:bookid', async (req,res) =>{
     const db = await connect();
     //
     const result = await db.collection('books').deleteOne({_id:ObjectId(bookid)});
-    console.log(result);
+    //console.log(result);
     //return true
-    if(result.deleteCount > 0){
-        res.json({ code: 201, message: `Book ${bookid} se ha eliminado`})
-        return 
+    if(result.deletedCount > 0) {
+        console.log(`el libro se elimino con exito ${bookid}`)
+        return res.json({ code: 201, message: `El libro ${bookid} se ha eliminado`})
     }else{
-        return res.json({message: `no se pudo eliminar el libro ${bookid}`})
+        console.log(`no se pudo eliminar el libro ${bookid}`)
+        return res.json({code: 404, message: `no se pudo eliminar el libro ${bookid}`})
     }
+    
 })
-
+/*
 //find by title
 router.get('/find-book-by-title', async (req, res) =>{
     var title = req.query.booktitle;
