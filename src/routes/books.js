@@ -85,7 +85,28 @@ router.delete('/delete-book/:bookid', async (req,res) =>{
         return res.json({code: 404, message: `no se pudo eliminar el libro ${bookid}`})
     }
     
+});
+
+//find by title
+router.get('/find-book-by-title', async (req,res) =>{
+    var title = req.query.booktitle;
+    console.log(title)
+    //query object Mongo DB
+    const query = {title: {$eq: title}};
+    const db = await connect();
+    const result = await db.collection('books').find(query).toArray();
+    console.log(result)
+    if (result.length <= 0){
+        console.log(`no se econtro resultados con ${title}`)
+        return res.json({code:200, message: `no encontro resultado para ${title}`})
+        
+    }
+    res.json({
+        code: 201, message: `los siguientes libros se encontraron con ${title}`,
+    result: result})
+    
 })
+
 /*
 //find by title
 router.get('/find-book-by-title', async (req, res) =>{
